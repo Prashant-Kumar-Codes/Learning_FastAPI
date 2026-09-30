@@ -55,6 +55,31 @@ class Paitent(BaseModel):
         elif self.bmi < 30: return 'Overweight'
         else: return 'Obese'
 
+# create a pydantic data and type valication base model
+class Paitent(BaseModel):
+    id: Annotated[str,  Field(..., max_length=4, title='Paitent\'s ID', description='Paitents ID not more than 4 characters', examples=['P001'])]
+    name: Annotated[str, Field(..., max_length=50, title='Paitent\'s Full Name', description='Name of the student not more than 50 characters', examples=['Prashant Kumar'])]
+    city: Annotated[str, Field(..., max_length=100, title='City Name', description='Name of city or nearest city the Paitent belong to.', examples=['Mohali'])]
+    age: Annotated[int, Field(..., gt=0, lt=120 , title='Age of the Paitent', description='Enter age of the Paitent if newly born then 1.', examples=[1,12,35])]
+    gender: Annotated[str, Field(..., max_lenght=10)]
+    height: Annotated[float, Field(..., gt=0)]
+    weight: Annotated[float, Field(..., gt=0)]
+
+    @computed_field
+    @property
+    def bmi(self) -> float:
+        bmi = round(self.weight/(self.height**2), 2)
+        return bmi
+
+    @computed_field
+    @property
+    def verdict(self) -> str:
+        if self.bmi < 18.5: return 'Underweight'
+        elif self.bmi < 25: return 'Normal'
+        elif self.bmi < 30: return 'Overweight'
+        else: return 'Obese'
+
+
 @app.get("/")
 def welcome():
     return {'message':'Welcome to Patients Mangement System API'}
@@ -123,8 +148,7 @@ def sort_by_paitents(sort_by: str = Query(..., description='sort by age, height 
 
 
 
-
-
+# a post to method to create new Paitents
 @app.post('/createPaitent')
 def createPaitent(paitent: Paitent):
     data = load_data()
@@ -141,5 +165,7 @@ def createPaitent(paitent: Paitent):
 
 
 
-    
-    
+# # a put method to update the existing paitents
+# @app.put('/update')
+# def updatePaitent(updatePatient: UpdatePaitent): # need to create a new pydantic paitent class with optional values as not all the field are requierd
+#     pass
