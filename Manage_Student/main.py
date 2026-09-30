@@ -23,20 +23,20 @@ app = FastAPI()
 # helper function
 
 def load_data():
-    with open('paitents.json', 'r') as f:
+    with open('Students.json', 'r') as f:
         data = json.load(f)
     return data
 
 def save_data(data):
-    with open('paitents.json', 'a') as f:
+    with open('Students.json', 'a') as f:
         json.dump(data, f)
 
 # create a pydantic data and type valication base model
-class Paitent(BaseModel):
-    id: Annotated[str,  Field(..., max_length=4, title='Paitent\'s ID', description='Paitents ID not more than 4 characters', examples=['P001'])]
-    name: Annotated[str, Field(..., max_length=50, title='Paitent\'s Full Name', description='Name of the student not more than 50 characters', examples=['Prashant Kumar'])]
-    city: Annotated[str, Field(..., max_length=100, title='City Name', description='Name of city or nearest city the Paitent belong to.', examples=['Mohali'])]
-    age: Annotated[int, Field(..., gt=0, lt=120 , title='Age of the Paitent', description='Enter age of the Paitent if newly born then 1.', examples=[1,12,35])]
+class student(BaseModel):
+    id: Annotated[str,  Field(..., max_length=4, title='student\'s ID', description='Students ID not more than 4 characters', examples=['P001'])]
+    name: Annotated[str, Field(..., max_length=50, title='student\'s Full Name', description='Name of the student not more than 50 characters', examples=['Prashant Kumar'])]
+    city: Annotated[str, Field(..., max_length=100, title='City Name', description='Name of city or nearest city the student belong to.', examples=['Mohali'])]
+    age: Annotated[int, Field(..., gt=0, lt=120 , title='Age of the student', description='Enter age of the student if newly born then 1.', examples=[1,12,35])]
     gender: Annotated[str, Field(..., max_lenght=10)]
     height: Annotated[float, Field(..., gt=0)]
     weight: Annotated[float, Field(..., gt=0)]
@@ -56,11 +56,11 @@ class Paitent(BaseModel):
         else: return 'Obese'
 
 # create a pydantic data and type valication base model
-class Paitent(BaseModel):
-    id: Annotated[str,  Field(..., max_length=4, title='Paitent\'s ID', description='Paitents ID not more than 4 characters', examples=['P001'])]
-    name: Annotated[str, Field(..., max_length=50, title='Paitent\'s Full Name', description='Name of the student not more than 50 characters', examples=['Prashant Kumar'])]
-    city: Annotated[str, Field(..., max_length=100, title='City Name', description='Name of city or nearest city the Paitent belong to.', examples=['Mohali'])]
-    age: Annotated[int, Field(..., gt=0, lt=120 , title='Age of the Paitent', description='Enter age of the Paitent if newly born then 1.', examples=[1,12,35])]
+class student(BaseModel):
+    id: Annotated[str,  Field(..., max_length=4, title='student\'s ID', description='Students ID not more than 4 characters', examples=['P001'])]
+    name: Annotated[str, Field(..., max_length=50, title='student\'s Full Name', description='Name of the student not more than 50 characters', examples=['Prashant Kumar'])]
+    city: Annotated[str, Field(..., max_length=100, title='City Name', description='Name of city or nearest city the student belong to.', examples=['Mohali'])]
+    age: Annotated[int, Field(..., gt=0, lt=120 , title='Age of the student', description='Enter age of the student if newly born then 1.', examples=[1,12,35])]
     gender: Annotated[str, Field(..., max_lenght=10)]
     height: Annotated[float, Field(..., gt=0)]
     weight: Annotated[float, Field(..., gt=0)]
@@ -82,7 +82,7 @@ class Paitent(BaseModel):
 
 @app.get("/")
 def welcome():
-    return {'message':'Welcome to Patients Mangement System API'}
+    return {'message':'Welcome to Students Mangement System API'}
 
 @app.get("/about")
 def about():
@@ -99,21 +99,21 @@ def view():
 Title, Description, Example, ge, gt, le, lt, Min_length, Max_length, Regex
 '''
 
-# to get the patient details with paitent id
-@app.get("/paitent/{paitent_id}")
-def view_paitents_via_id(paitent_id: str = Path(..., description='ID of the paitent in the DB', examples='P001')):
+# to get the student details with student id
+@app.get("/student/{student_id}")
+def view_students_via_id(student_id: str = Path(..., description='ID of the student in the DB', examples='P001')):
     # load all the data
     data = load_data()
-    if paitent_id in data:
-        return data[paitent_id]
-    raise HTTPException(status_code=404, detail=f'paitent id {paitent_id} not found in the date')
+    if student_id in data:
+        return data[student_id]
+    raise HTTPException(status_code=404, detail=f'student id {student_id} not found in the date')
 
 #
 
 # ------------- Query Parameter -------------
 '''
 Example:
-/patients?city=Delhi&sort_by=age
+/students?city=Delhi&sort_by=age
 
 Syntax Rules:
 
@@ -123,13 +123,13 @@ Syntax Rules:
 
 In this example:
 
-- city=Delhi is a query parameter for filtering patients by city
+- city=Delhi is a query parameter for filtering students by city
 - sort_by=age is a query parameter for sorting results by age
 '''
 
 # a query endpoint to get the data in sorted form in either asc or desc order
 @app.get('/sort')
-def sort_by_paitents(sort_by: str = Query(..., description='sort by age, height or bmi'), 
+def sort_by_students(sort_by: str = Query(..., description='sort by age, height or bmi'), 
                      order: str = Query('asc', description='sort in ascending or descending order')):
     valid_sort_by = ['height', 'weight', 'bmi']
 
@@ -148,16 +148,16 @@ def sort_by_paitents(sort_by: str = Query(..., description='sort by age, height 
 
 
 
-# a post to method to create new Paitents
-@app.post('/createPaitent')
-def createPaitent(paitent: Paitent):
+# a post to method to create new Students
+@app.post('/createStudent')
+def createStudent(student: student):
     data = load_data()
-    paitent_data = {}
+    student_data = {}
 
     # model_dump is to unpack the object data into the data format
-    paitent_data[paitent.id] = paitent.model_dump(exclude='id')
+    student_data[student.id] = student.model_dump(exclude='id')
 
-    if paitent.id in data: raise HTTPException(status_code=400, detail='Paitent already exists')
+    if student.id in data: raise HTTPException(status_code=400, detail='student already exists')
 
     save_data(data)
 
@@ -165,7 +165,7 @@ def createPaitent(paitent: Paitent):
 
 
 
-# # a put method to update the existing paitents
+# # a put method to update the existing Students
 # @app.put('/update')
-# def updatePaitent(updatePatient: UpdatePaitent): # need to create a new pydantic paitent class with optional values as not all the field are requierd
+# def updateStudent(updatePatient: UpdateStudent): # need to create a new pydantic student class with optional values as not all the field are requierd
 #     pass
