@@ -2,7 +2,7 @@
 FROM python:3.12.10-slim
 
 # Set working directory
-WORKDIR /Manage_Students
+WORKDIR /Manage_Student
 
 # copy requirements and install dependencies
 COPY requirements.txt .
